@@ -2,6 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+  <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#F5C518">
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Sparky — Excel for Electricians</title>
 <!-- SheetJS (xlsx) v0.18.5 mini build — bundled inline so Sparky works fully offline. -->
