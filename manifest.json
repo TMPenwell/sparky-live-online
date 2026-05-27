@@ -8,15 +8,15 @@
   "theme_color": "#F5C518",
   "orientation": "landscape",
   "icons": [
-    {
-      "src": "https://via.placeholder.com/192x192/1A1F3A/F5C518?text=S",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "https://via.placeholder.com/512x512/1A1F3A/F5C518?text=S",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ]
+  {
+    "src": "SPARKY.JPG",
+    "sizes": "192x192",
+    "type": "image/jpeg"
+  },
+  {
+    "src": "SPARKY.JPG",
+    "sizes": "512x512",
+    "type": "image/jpeg"
+  }
+]
 }
