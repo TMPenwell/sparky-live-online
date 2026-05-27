@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sparky</title>
+<script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    font-family: 'Calibri', sans-serif;
+    background: #F7F7F5;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .header {
+    background: #1A1F3A;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .header h1 {
+    color: #F5C518;
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: 2px;
+  }
+
+  .header span {
+    color: #718096;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .level-bar {
+    background: #fff;
+    border-bottom: 1px solid #E2E8F0;
+    padding: 8px 14px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .level-bar span {
+    font-size: 10px;
+    color: #718096;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-right: 4px;
+  }
+
+  .level-btn {
+    padding: 4px 10px;
+    border: 1px solid #CBD5E0;
+    background: transparent;
+    border-radius: 3px;
+    font-size: 11px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #4A5568;
+  }
+
+  .level-btn.active {
+    background: #1A1F3A;
+    color: #F5C518;
+    border-color: #1A1F3A;
+    font-weight: bold;
+  }
+
+  .chat {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .msg {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .msg-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #718096;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .kolb-tag {
+    background: #2B6CB0;
+    color: white;
+    font-size: 9px;
+    padding: 1px 6px;
+    border-radius: 2px;
+    font-weight: bold;
+  }
+
+  .kolb-tag.reflect { background: #276749; }
+  .kolb-tag.concept { background: #2B6CB0; }
+  .kolb-tag.apply { background: #744210; }
+  .kolb-tag.challenge { background: #742A2A; }
+
+  .msg-bubble {
+    background: white;
+    border: 1px solid #E2E8F0;
+    border-radius: 4px;
+    padding: 10px 12px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #2D3748;
+  }
+
+  .msg-bubble.user {
+    background: #EBF4FF;
+    border-color: #BEE3F8;
+  }
+
+  .msg-bubble code {
+    background: #1A1F3A;
+    color: #F5C518;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-family: monospace;
+    font-size: 12px;
+  }
+
+  .context-bar {
+    background: #FFFBEB;
+    border-top: 1px solid #F6E05E;
+    border-bottom: 1px solid #F6E05E;
+    padding: 6px 14px;
+    font-size: 11px;
+    color: #744210;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .context-bar button {
+    margin-left: auto;
+    background: #F5C518;
+    border: none;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+  }
+
+  .input-area {
+    padding: 10px 14px;
+    background: white;
+    border-top: 1px solid #E2E8F0;
+    display: flex;
+    gap: 8px;
+  }
+
+  .input-area textarea {
+    flex: 1;
+    border: 1px solid #CBD5E0;
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 13px;
+    resize: none;
+    height: 60px;
+    font-family: inherit;
+    color: #2D3748;
+  }
+
+  .input-area textarea:focus {
+    outline: none;
+    border-color: #F5C518;
+  }
+
+  .ask-btn {
+    background: #1A1F3A;
+    color: #F5C518;
+    border: none;
+    border-radius: 4px;
+    padding: 0 16px;
+    font-weight: bold;
+    font-size: 13px;
+    cursor: pointer;
+    letter-spacing: 1px;
+  }
+
+  .ask-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .thinking {
+    font-style: italic;
+    color: #718096;
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>SPARKY</h1>
+  <span>Excel for the Trades</span>
+</div>
+
+<div class="level-bar">
+  <span>I'm:</span>
+  <button class="level-btn active" onclick="setLevel('apprentice', this)">Apprentice</button>
+  <button class="level-btn" onclick="setLevel('journeyman', this)">Journeyman</button>
+  <button class="level-btn" onclick="setLevel('master', this)">Master/Owner</button>
+</div>
+
+<div class="context-bar" id="context-bar">
+  <span id="context-text">📊 Click "Read Sheet" to let Sparky see your spreadsheet</span>
+  <button onclick="readSheet()">Read Sheet</button>
+</div>
+
+<div class="chat" id="chat">
+  <div class="msg">
+    <div class="msg-label">SPARKY</div>
+    <div class="msg-bubble">
+      Hey! I'm Sparky. I'm here to help you learn Excel for estimating and bidding jobs.<br><br>
+      Hit <strong>Read Sheet</strong> above to let me see what's in your spreadsheet, then ask me about any cell you're working on.
+    </div>
+  </div>
+</div>
+
+<div class="input-area">
+  <textarea id="input" placeholder="Ask about a cell, like D12 or the materials subtotal..."></textarea>
+  <button class="ask-btn" id="ask-btn" onclick="send()">ASK</button>
+</div>
+
+<script>
+  const PROXY_URL = 'https://sparkyproxy.tashampenwell.workers.dev';
+  
+  let level = 'apprentice';
+  let history = [];
+  let sheetContext = '';
+
+  Office.onReady(info => {
+    if (info.host === Office.HostType.Excel) {
+      console.log('Sparky loaded in Excel');
+    }
+  });
+
+  function setLevel(l, btn) {
+    level = l;
+    document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    history = [];
+  }
+
+  async function readSheet() {
+    const bar = document.getElementById('context-bar');
+    const text = document.getElementById('context-text');
+    text.textContent = '📊 Reading your spreadsheet...';
+
+    try {
+      await Excel.run(async context => {
+        const sheet = context.workbook.worksheets.getActiveWorksheet();
+        const range = sheet.getUsedRange();
+        range.load(['values', 'address']);
+        await context.sync();
+
+        const values = range.values;
+        const address = range.address;
+
+        // Build a compact text summary of the sheet
+        let summary = `Active sheet data (${address}):\n`;
+        values.forEach((row, r) => {
+          row.forEach((cell, c) => {
+            if (cell !== '' && cell !== null) {
+              const col = String.fromCharCode(65 + c);
+              summary += `${col}${r + 1}: ${cell}\n`;
+            }
+          });
+        });
+
+        sheetContext = summary;
+        text.textContent = `✅ Sparky can see your sheet (${values.length} rows)`;
+        bar.style.background = '#F0FFF4';
+        bar.style.borderColor = '#9AE6B4';
+        bar.style.color = '#276749';
+
+        addMessage('sparky', 'REFLECT', `Got it — I can see your spreadsheet now. What cell or calculation are you trying to figure out?`);
+      });
+    } catch (err) {
+      text.textContent = '❌ Could not read sheet: ' + err.message;
+    }
+  }
+
+  function buildSystemPrompt() {
+    const levelPrompts = {
+      apprentice: `You are Sparky, an expert Excel tutor for electrician apprentices. You use Kolb's Experiential Learning Cycle. Never just give the answer or formula directly. First REFLECT by asking the learner what they're trying to figure out and how they'd do it by hand. Then use CONCEPT to introduce the Excel function as an abstraction of their reasoning. Then APPLY by having them enter a specific formula. Then CHALLENGE by pushing slightly further. Tag each response with [REFLECT], [CONCEPT], [APPLY], or [CHALLENGE]. Keep language simple and trade-focused.`,
+      journeyman: `You are Sparky, an Excel tutor for journeyman electricians. Use Kolb's cycle but move faster. Assume basic Excel knowledge. Focus on efficiency and accuracy in bidding. Tag responses with [REFLECT], [CONCEPT], [APPLY], or [CHALLENGE].`,
+      master: `You are Sparky, an Excel advisor for master electricians and business owners. Focus on business outcomes — markup strategy, job costing, profit margins. Tag responses with [REFLECT], [CONCEPT], [APPLY], or [CHALLENGE].`
+    };
+
+    let prompt = levelPrompts[level];
+    if (sheetContext) {
+      prompt += `\n\nThe user's current Excel spreadsheet contains:\n${sheetContext}\nReference specific cells when coaching them.`;
+    }
+    return prompt;
+  }
+
+  function addMessage(role, tag, text) {
+    const chat = document.getElementById('chat');
+    const div = document.createElement('div');
+    div.className = 'msg';
+
+    const tagClass = tag ? tag.toLowerCase() : '';
+    const tagHtml = tag ? `<span class="kolb-tag ${tagClass}">${tag}</span>` : '';
+
+    div.innerHTML = `
+      <div class="msg-label">${role.toUpperCase()} ${tagHtml}</div>
+      <div class="msg-bubble ${role === 'you' ? 'user' : ''}">${text}</div>
+    `;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  function extractTag(text) {
+    const match = text.match(/\[(REFLECT|CONCEPT|APPLY|CHALLENGE)\]/i);
+    return match ? match[1] : null;
+  }
+
+  function cleanText(text) {
+    return text
+      .replace(/\[(REFLECT|CONCEPT|APPLY|CHALLENGE)\]/gi, '')
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n/g, '<br>')
+      .trim();
+  }
+
+  async function send() {
+    const input = document.getElementById('input');
+    const btn = document.getElementById('ask-btn');
+    const text = input.value.trim();
+    if (!text) return;
+
+    addMessage('you', null, text);
+    history.push({ role: 'user', content: text });
+    input.value = '';
+    btn.disabled = true;
+
+    // Show thinking
+    const chat = document.getElementById('chat');
+    const thinking = document.createElement('div');
+    thinking.className = 'msg';
+    thinking.innerHTML = '<div class="msg-label">SPARKY</div><div class="msg-bubble thinking">working it through...</div>';
+    chat.appendChild(thinking);
+    chat.scrollTop = chat.scrollHeight;
+
+    try {
+      const geminiContents = [
+        { role: 'user', parts: [{ text: buildSystemPrompt() }] },
+        { role: 'model', parts: [{ text: 'Understood. I am Sparky, ready to help.' }] },
+        ...history.slice(0, -1).map(m => ({
+          role: m.role === 'assistant' ? 'model' : 'user',
+          parts: [{ text: m.content }]
+        })),
+        { role: 'user', parts: [{ text: history[history.length - 1].content }] }
+      ];
+
+      const res = await fetch(PROXY_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: geminiContents,
+          generationConfig: { temperature: 0.5, maxOutputTokens: 700 }
+        })
+      });
+
+      const data = await res.json();
+      const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || '(empty response)';
+      
+      thinking.remove();
+
+      const tag = extractTag(reply);
+      const cleaned = cleanText(reply);
+      addMessage('sparky', tag, cleaned);
+      history.push({ role: 'assistant', content: reply });
+
+    } catch (err) {
+      thinking.remove();
+      addMessage('sparky', null, `Can't reach Sparky right now. Error: ${err.message}`);
+    }
+
+    btn.disabled = false;
+    input.focus();
+  }
+
+  document.getElementById('input').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      send();
+    }
+  });
+</script>
+</body>
+</html>
