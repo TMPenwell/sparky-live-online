@@ -54,7 +54,7 @@ Sparky is a learning tool for Excel skills. It is **not** a substitute for the N
 ## Built with
 
 - HTML/JavaScript web app and Excel add-in (task pane)
-- AI model: <!-- TODO: confirm, Gemma 4 (local) or Gemini 2.0 Flash -->
+- AI model: Gemini 2.5
 
 ## About
 
