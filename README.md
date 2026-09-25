@@ -53,8 +53,9 @@ Sparky is a learning tool for Excel skills. It is **not** a substitute for the N
 
 ## Built with
 
-- HTML/JavaScript web app and Excel add-in (task pane)
-- AI model: Gemini 2.5
+- HTML/JavaScript web app and Excel add-in (Office.js task pane)
+- Google Gemini 2.5, called through a Cloudflare Worker proxy
+- Kolb stages come from tags the model adds to each reply (`[REFLECT]`, `[CONCEPT]`, `[APPLY]`, `[CHALLENGE]`), which the add-in shows as color-coded labels
 
 ## About
 
